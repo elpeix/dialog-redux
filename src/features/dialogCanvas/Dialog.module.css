@@ -1,0 +1,105 @@
+.dialog {
+    position: absolute;
+    min-width: 200px;
+    min-height: 200px;
+    background-color: #fafafa;
+    box-shadow: 2px 2px 6px rgb(206, 206, 206);
+    border-radius: 5px;
+}
+
+.header {
+    background-color: lightgray;
+    padding: 10px;
+    overflow: auto;
+    line-height: 10px;
+    border-radius: 5px 5px 0 0;
+    cursor: default;
+    color: dimgray;
+    text-align: left;
+}
+.header_icon {
+    float: left;
+    padding: 5px;
+    margin: -5px;
+    background-color: darkcyan;
+    border-radius: 3px;
+    cursor: default;
+    width: 10px;
+    height: 10px;
+}
+
+.header_title {
+    float: left;
+    padding: 5px;
+    margin: -5px 5px;
+}
+
+.header_action {
+    float: right;
+    padding: 5px;
+    margin: -5px -5px -5px 10px;
+    background-color: lightgrey;
+    color: white;
+    font-weight: bold;
+    border-radius: 3px;
+    cursor: default;
+}
+.header_action:hover {
+    background-color: grey;
+}
+
+.focused {
+    box-shadow: 2px 2px 6px rgb(139, 139, 139);
+}
+
+.focused > .header {
+    background-color: dimgray;
+    color: white;
+}
+
+.focused .header_close {
+    background-color: brown;
+}
+
+.header_minimize:hover {
+    background-color: cornflowerblue;
+}
+.header_maximize:hover {
+    background-color: goldenrod;
+}
+.header_close:hover {
+    background-color: crimson;
+}
+
+.content {
+    min-height: 180px;
+    width: 100%;
+    overflow: auto;
+    position: relative;
+}
+
+.dialog.resizing .content {
+    background-color: white;
+    visibility: hidden;
+}
+.footer {
+    width: 100%;
+    position: relative;
+}
+.footer > .resizer {
+    position:absolute;
+    cursor: nwse-resize;
+    background-color: transparent;
+    width: 20px;
+    height: 20px;
+    bottom: 0;
+    right: 0;
+    border-radius: 0 0 5px 0;
+
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 20px 20px;
+    border-color: transparent transparent dimgrey transparent;
+
+}
