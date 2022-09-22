@@ -7,6 +7,18 @@
     border-radius: 5px;
 }
 
+.dialog.maximized {
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 50px !important;
+    width: 100% !important;
+    height: calc(100% - 50px) !important;
+    transform: translate(0px) !important;
+    box-shadow: 0px 0px 0px !important;
+    border-radius: 0px !important;
+}
+
 .header {
     background-color: lightgray;
     padding: 10px;
@@ -16,6 +28,10 @@
     cursor: default;
     color: dimgray;
     text-align: left;
+    user-select: none;
+}
+.dialog.maximized .header {
+    border-radius: 0;
 }
 .header_icon {
     float: left;
@@ -72,15 +88,20 @@
 }
 
 .content {
-    min-height: 180px;
-    width: 100%;
     overflow: auto;
     position: relative;
+    top: 0px;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: calc(100% - 30px);
 }
 
 .dialog.resizing .content {
     background-color: white;
     visibility: hidden;
+    user-select: none;
 }
 .footer {
     width: 100%;
@@ -101,5 +122,4 @@
     border-style: solid;
     border-width: 0 0 20px 20px;
     border-color: transparent transparent dimgrey transparent;
-
 }

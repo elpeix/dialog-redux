@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { dialogActions } from "./dialogsSlice";
 import styles from "./Dialog.module.css";
+import Draggable from 'react-draggable';
 
 function Dialog(props) {
 	const [dialog, setDialog] = useState({
@@ -12,153 +13,92 @@ function Dialog(props) {
 		top: props.config.top || 100,
 	});
 
+	const dragHandlers = {
+		onStart: () => toTop(),
+		onDrag: (el) => console.log(el)
+	};
+
     const dispatch = useDispatch();
 
 	const dialogRef = useRef(null);
 	const dialogContent = useRef(null);
 
-	const move = {
-		onMouseDown: (e) => {
-			toTop();
-			if (e.button !== 0) return;
-			setDialog((ov) => ({
-				...ov,
-				dragging: true,
-				rel: {
-					left: e.pageX - dialog.left,
-					top: e.pageY - dialog.top,
-				},
-			}));
-		},
-		onMouseUp: () => endMove(),
-		onMouseLeave: () => endMove(),
-		onMouseMove: (e) => {
-			if (!dialog.dragging) return;
-			
-			const top = (e.pageY - dialog.rel.top < 15) 
-				? 0
-				: Math.min(e.pageY - dialog.rel.top, window.innerHeight - 80);
-			const left = Math.min(Math.max(0, e.pageX - dialog.rel.left), window.innerWidth - 50);
-
-			if (dialog.maximized) {
-				return;
-			} 
-
-			dialogRef.current.style.top = `${top}px`;
-			dialogRef.current.style.left = `${left}px`;
-		},
-	};
-	const endMove = () => {
-		if (!dialog.dragging) return;
-		setDialog((ov) => ({
-			...ov,
-			dragging: false,
-			left: dialogRef.current.offsetLeft,
-			top: dialogRef.current.offsetTop,
-		}));
-	};
-
-	const resize = {
-		onMouseDown: (e) => {
-			toTop();
-			if (e.button !== 0) return;
-			setDialog((ov) => ({
+	const handleResize = (mouseDownEvent) => {
+		const size = {
+			width: dialog.width,
+			height: dialog.height
+		};
+		const position = {
+			x: mouseDownEvent.pageX,
+			y: mouseDownEvent.pageY
+		};
+		const onMouseMove = (mouseMoveEvent) => {
+			setDialog(ov => ({
 				...ov,
 				resizing: true,
-				rel: {
-					width: e.pageX - dialog.width,
-					height: e.pageY - dialog.height,
-				},
+				width: size.width - position.x + mouseMoveEvent.pageX,
+				height: size.height - position.y + mouseMoveEvent.pageY
 			}));
-		},
-		onMouseUp: (e) => endResize(e),
-		onMouseLeave: (e) => endResize(e),
-		onMouseMove: (e) => {
-			if (!dialog.resizing) return;
-			const width = e.pageX - dialog.rel.width;
-			const height = e.pageY - dialog.rel.height;
-			dialogContent.current.style.width = `${width}px`;
-			dialogContent.current.style.height = `${height}px`;
-		},
-	};
-	const endResize = (e) => {
-		e.stopPropagation();
-		if (!dialog.resizing) return;
-		setDialog((ov) => ({
-			...ov,
-			resizing: false,
-			maximized: false,
-			height: dialogRef.current.clientHeight - 30,
-			width: dialogRef.current.clientWidth,
-		}));
+		};
+		const onMouseUp = () => {
+			document.body.removeEventListener("mousemove", onMouseMove);
+			setDialog(ov => ({
+				...ov,
+				resizing: false
+			}));
+		}
+
+		document.body.addEventListener("mousemove", onMouseMove);
+		document.body.addEventListener("mouseup", onMouseUp, { once: true });
 	};
 
 	const toggleMaximize = (e) => {
-		e.stopPropagation();
-		if (dialog.maximized) {
-			setDialog((ov) => ({
-				...ov,
-				maximized: false,
-				height: dialog.unmaximixed.height,
-				width: dialog.unmaximixed.width,
-				top: dialog.unmaximixed.top,
-				left: dialog.unmaximixed.left
-			}));
-		} else {
-			setDialog((ov) => ({
-				...ov,
-				maximized: true,
-				height: window.innerHeight - 80,
-				width: window.innerWidth,
-				top: 0,
-				left: 0,
-				unmaximixed: {
-					height: dialog.height,
-					width: dialog.width,
-					top: dialog.top,
-					left: dialog.left
-				}
-			}));
-		}
+		setDialog(ov => ({...ov, maximized: !dialog.maximized}));
+		toTop();
 	}
 
 	const toggleMinimize = () => dispatch(dialogActions.toggleMinimize({id: props.id}));
 	const toTop = () => dispatch(dialogActions.toTop({id: props.id}));
 	const close = () => dispatch(dialogActions.close({id: props.id}));
+	const bounds = {
+		top: -props.config.top,
+		left: -props.config.left,
+		bottom: window.innerHeight - (80 + props.config.top),
+		right: window.innerWidth - (30 + props.config.left) 
+	};
+	let dialogStyle = {
+		display: props.config.minimized ? 'none' : '',
+		zIndex: props.config.zIndex,
+		position: 'absolute',
+		top: dialog.top + "px",
+		left: dialog.left + "px",
+		height: dialog.height + "px",
+		width: dialog.width + "px",
+	}
 
 	return (
+		<Draggable handle="header.dialog-drag" cancel=".dialog-no-drag" disabled={dialog.maximized} bounds={bounds} defaultPosition={{ x: 0, y: 0 }} {...dragHandlers}>
 		<div
-			className={styles.dialog + (props.config.focused ? " " + styles.focused : "") + (dialog.resizing ? " " + styles.resizing : "")}
+			className={`${styles.dialog} ${dialog.maximized ? styles.maximized : ""}` + (props.config.focused ? " " + styles.focused : "") + (dialog.resizing ? " " + styles.resizing : "")}
 			ref={dialogRef}
-			style={{
-				display: props.config.minimized ? 'none' : '',
-				zIndex: props.config.zIndex,
-				top: dialog.top + "px",
-				left: dialog.left + "px",
-			}}
-			onMouseUp={toTop}
+			style={dialogStyle}
+			onClick={toTop}
 		>
-			<div className={styles.header} {...move} onDoubleClick={toggleMaximize}>
+			<header className={`dialog-drag ${styles.header}`} onDoubleClick={toggleMaximize}>
 				<div className={styles.header_icon}>&nbsp;</div>
 				<div className={styles.header_title}>{props.id}</div>
-				<div className={`${styles.header_action} ${styles.header_close}`} onClick={close}>X</div>
-				<div className={`${styles.header_action} ${styles.header_maximize}`} onClick={toggleMaximize}>{dialog.maximized ? '-' : '^'}</div>
-				<div className={`${styles.header_action} ${styles.header_minimize}`} onClick={toggleMinimize}>_</div>
-			</div>
-			<div
-				className={styles.content}
-				ref={dialogContent}
-				style={{
-					height: dialog.height + "px",
-					width: dialog.width + "px",
-				}}
-			>
+				<div className={`dialog-no-drag ${styles.header_action} ${styles.header_close}`} onClick={close}>X</div>
+				<div className={`dialog-no-drag ${styles.header_action} ${styles.header_maximize}`} onClick={toggleMaximize}>{dialog.maximized ? '-' : '^'}</div>
+				<div className={`dialog-no-drag ${styles.header_action} ${styles.header_minimize}`} onClick={toggleMinimize}>_</div>
+			</header>
+			<div className={styles.content} ref={dialogContent}>
 				{props.children}
 			</div>
 			<div className={styles.footer}>
-				<div className={styles.resizer} {...resize}></div>
+				{!dialog.maximized && <div className={styles.resizer} onMouseDown={handleResize}></div>}
 			</div>
 		</div>
+		</Draggable>
 	);
 }
 
