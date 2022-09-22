@@ -13,15 +13,12 @@ function Dialog(props) {
 		top: props.config.top || 100,
 	});
 
-	const dragHandlers = {
-		onStart: () => toTop(),
-		onDrag: (el) => console.log(el)
-	};
-
     const dispatch = useDispatch();
-
+	
 	const dialogRef = useRef(null);
 	const dialogContent = useRef(null);
+	
+	const dragHandlers = { onStart: () => toTop() };
 
 	const handleResize = (mouseDownEvent) => {
 		const size = {
@@ -46,18 +43,18 @@ function Dialog(props) {
 				...ov,
 				resizing: false
 			}));
-		}
-
+		};
 		document.body.addEventListener("mousemove", onMouseMove);
 		document.body.addEventListener("mouseup", onMouseUp, { once: true });
 	};
 
-	const toggleMaximize = (e) => {
+	const toggleMaximize = () => {
 		setDialog(ov => ({...ov, maximized: !dialog.maximized}));
 		toTop();
 	}
 
 	const toggleMinimize = () => dispatch(dialogActions.toggleMinimize({id: props.id}));
+
 	const toTop = () => dispatch(dialogActions.toTop({id: props.id}));
 	const close = () => dispatch(dialogActions.close({id: props.id}));
 	const bounds = {
