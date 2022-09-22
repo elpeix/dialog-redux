@@ -30,6 +30,7 @@ function Dialog(props) {
 			y: mouseDownEvent.pageY
 		};
 		const onMouseMove = (mouseMoveEvent) => {
+			document.body.classList.add('resizing');
 			setDialog(ov => ({
 				...ov,
 				resizing: true,
@@ -43,6 +44,7 @@ function Dialog(props) {
 				...ov,
 				resizing: false
 			}));
+			document.body.classList.remove('resizing');
 		};
 		document.body.addEventListener("mousemove", onMouseMove);
 		document.body.addEventListener("mouseup", onMouseUp, { once: true });
@@ -53,17 +55,21 @@ function Dialog(props) {
 		toTop();
 	}
 
-	const toggleMinimize = () => dispatch(dialogActions.toggleMinimize({id: props.id}));
+	const toggleMinimize = (e) => {
+		e.stopPropagation();
+		dispatch(dialogActions.toggleMinimize({id: props.id}));
+	}
 
 	const toTop = () => dispatch(dialogActions.toTop({id: props.id}));
 	const close = () => dispatch(dialogActions.close({id: props.id}));
+
 	const bounds = {
 		top: -props.config.top,
 		left: -props.config.left,
 		bottom: window.innerHeight - (80 + props.config.top),
 		right: window.innerWidth - (30 + props.config.left) 
 	};
-	let dialogStyle = {
+	const dialogStyle = {
 		display: props.config.minimized ? 'none' : '',
 		zIndex: props.config.zIndex,
 		position: 'absolute',
@@ -74,7 +80,12 @@ function Dialog(props) {
 	}
 
 	return (
-		<Draggable handle="header.dialog-drag" cancel=".dialog-no-drag" disabled={dialog.maximized} bounds={bounds} defaultPosition={{ x: 0, y: 0 }} {...dragHandlers}>
+		<Draggable 
+			handle="header.dialog-drag" 
+			cancel=".dialog-no-drag" 
+			disabled={dialog.maximized} 
+			bounds={bounds} 
+			{...dragHandlers}>
 		<div
 			className={`${styles.dialog} ${dialog.maximized ? styles.maximized : ""}` + (props.config.focused ? " " + styles.focused : "") + (dialog.resizing ? " " + styles.resizing : "")}
 			ref={dialogRef}

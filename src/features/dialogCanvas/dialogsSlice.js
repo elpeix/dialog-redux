@@ -57,23 +57,16 @@ export const dialogsSlice = createSlice({
             toTop(state.dialogs, action.payload.id);
         },
         toggleMinimize: (state, action) => {
-            console.log('minimize');
             const dialog = getDialog(state.dialogs, action.payload.id);
-            console.log(dialog.config.minimized ? true : false);
             if (!dialog) return;
             if (dialog.config.minimized) {
                 toTop(state.dialogs, action.payload.id);
                 return;
             }
-            state.dialogs = state.dialogs.map(dialog => {
-                if (dialog.id === action.payload.id) {
-                    dialog.config.zIndex = 0;
-                    dialog.config.minimized = true;
-                    dialog.config.focused = false;
-                }
-                return dialog;
-            });
-            toTopPrevious(state.dialogs);
+            dialog.config.minimized = true;
+            dialog.config.zIndex = 0;
+            dialog.config.focused = false;
+            toTopPrevious(state.dialogs)
         }
     }
 });
