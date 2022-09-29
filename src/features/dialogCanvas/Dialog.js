@@ -61,7 +61,10 @@ function Dialog(props) {
 	}
 
 	const toTop = () => dispatch(dialogActions.toTop({id: props.id}));
-	const close = () => dispatch(dialogActions.close({id: props.id}));
+	const close = (e) => {
+		e.stopPropagation();
+		dispatch(dialogActions.close({id: props.id}));
+	};
 
 	const bounds = {
 		top: -props.config.top,

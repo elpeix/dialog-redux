@@ -11,15 +11,16 @@ const DialogCanvas = (props) => {
     const dispatch = useDispatch();
 
     const createDialogSample = () => {
+		const id = parseInt(Math.random() * 1000);
         dispatch(dialogActions.create({
-            id: parseInt(Math.random() * 1000),
+            id: id,
             config: {
                 width: 500, 
                 height: 400
             },
             children: (
                 <div>
-                    <h2>The children</h2>
+                    <h2>The children - {id}</h2>
                 </div>
             )
         }))
