@@ -4,9 +4,8 @@ import Dialog from "./Dialog";
 import styles from "./DialogCanvas.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { dialogActions, dialogsState } from "./dialogsSlice";
-import Menu from '../../components/Menu';
 
-const DialogCanvas = (props) => {
+const DialogCanvas = ({menu}) => {
     const {dialogs} = useSelector(dialogsState);
     const dispatch = useDispatch();
 
@@ -33,7 +32,7 @@ const DialogCanvas = (props) => {
 			<div className={styles.dialogs}>
 				{dialogs.map((dialog) => (
 					<Dialog
-						key={"dialog" + dialog.id}
+						key={`dialog_${dialog.id}`}
 						id={dialog.id}
 						config={dialog.config}
 					>
@@ -42,11 +41,11 @@ const DialogCanvas = (props) => {
 				))}
 			</div>
 			<div className={styles.dialogsFooter}>
-                <Menu />
+				{menu}
                 <button onClick={createDialogSample}>Create Dialog</button>
 				<button onClick={closeAll}>Close All</button>
 				{dialogs.map((dialog) => (
-					<div
+					<div key={`footer_${dialog.id}`}
 						className={dialog.config.focused ? "focused" : ""}
 						onClick={() => toTop(dialog.id)}
 					>

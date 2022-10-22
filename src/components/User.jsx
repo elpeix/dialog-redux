@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { dialogActions } from "../features/dialogCanvas/dialogsSlice";
+import UserChildren from "./UserChildren";
 
 const User = (props) => {
 	const dispatch = useDispatch();
@@ -20,16 +21,14 @@ const User = (props) => {
 					height: 200,
 				},
 				children: (
-					<div>
-						<h4>I am a new dialog</h4>
-					</div>
+					<UserChildren />
 				),
 			})
 		);
 	};
 
 	const incLevel = (e) => {
-		e.stopPropagation();
+		//e.stopPropagation();
 		setUser((user) => ({ ...user, level: user.level + 1 }));
 	};
 

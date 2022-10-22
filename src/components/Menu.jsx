@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from "react-redux";
 import { dialogActions } from "../features/dialogCanvas/dialogsSlice";
-import User from "./User";
+import User from './User';
 
 const Menu = () => {
     const dispatch = useDispatch();
